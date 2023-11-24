@@ -1,48 +1,63 @@
 var express = require("express");
+var passport = require("passport");
+var localStrategy = require("passport-local");
 var router = express.Router();
 const userModel = require("./users");
 const postModel = require("./posts");
 
+passport.use(new localStrategy(userModel.authenticate()));
+
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("index", { title: "Express" });
+  res.send("You are on Index page.");
 });
 
-router.get("/createuser", async function (req, res, next) {
-  let createdUser = await userModel.create({
-    username: "imasifakhtar",
-    password: "asif123",
-    posts: [],
-    email: "admin@asifakhtar.me",
-    fullName: "Asif Akhtar",
-  });
-
-  res.send(createdUser);
-});
-
-router.get("/allusers", async function (req, res) {
-  let allUsers = await userModel.find();
-  
-  res.send(allUsers);
-});
-
-router.get("/createpost", async function (req, res, next) {
-  let createdpost = await postModel.create({
-    postsText: "Hello World 2!",
-    user: '655fd2b463e9104d33d53724',
-  });
-
-  let user = await userModel.findOne({_id: "655fd2b463e9104d33d53724"});
-  user.posts.push(createdpost._id);
-  await user.save();
-
-  res.send("Done!");
-});
-
-router.get('/myposts', async function(req, res) {
-  let myposts = await userModel.findOne({_id: '655fd2b463e9104d33d53724'}).populate('posts');
-
-  res.send(myposts);
+router.get('/profile', isLoggedIn, function(req, res) {
+  res.send("Profile Page Opened")
 })
+
+router.post("/register", async function (req, res) {
+  const { username, email, fullname } = req.body;
+  let userData = new userModel({ username, email, fullname });
+
+  userModel.register(userData, req.body.password).then(function () {
+    passport.authenticate("local")(req, res, function () {
+      res.redirect("/profile");
+    });
+  });
+});
+
+router.post(
+  "/signin",
+  passport.authenticate("local", {
+    successRedirect: "/profile",
+    failureRedirect: "/",
+  }),
+  function (req, res) {
+    res.send("Test Test");
+  }
+);
+
+router.get('/login', function(req, res) {
+  res.render('login');
+});
+
+router.get('/signup', function(req, res) {
+  res.render('signup');
+});
+
+router.get('/logout', function(req, res,next) {
+  req.logout(function(err) {
+    if(err) {
+      return next(err);
+    }
+    res.redirect('/');
+  })
+});
+
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  res.redirect('/');
+}
 
 module.exports = router;

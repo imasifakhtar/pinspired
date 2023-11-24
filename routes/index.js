@@ -28,10 +28,21 @@ router.get("/allusers", async function (req, res) {
 
 router.get("/createpost", async function (req, res, next) {
   let createdpost = await postModel.create({
-    postsText: "Hello World",
+    postsText: "Hello World 2!",
+    user: '655fd2b463e9104d33d53724',
   });
 
-  res.send(createdpost);
+  let user = await userModel.findOne({_id: "655fd2b463e9104d33d53724"});
+  user.posts.push(createdpost._id);
+  await user.save();
+
+  res.send("Done!");
 });
+
+router.get('/myposts', async function(req, res) {
+  let myposts = await userModel.findOne({_id: '655fd2b463e9104d33d53724'}).populate('posts');
+
+  res.send(myposts);
+})
 
 module.exports = router;

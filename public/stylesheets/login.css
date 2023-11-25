@@ -158,7 +158,7 @@ hr {
 .upbtn {
   position: relative;
   top: 3%;
-  left: 140px;
+  left: 2%;
   font-size: 16px;
   font-weight: 700;
   text-align: center;
@@ -168,4 +168,10 @@ hr {
   border: none;
   border-radius: 20px;
   cursor: pointer;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  width: 100%;
 }

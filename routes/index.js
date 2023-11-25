@@ -12,11 +12,17 @@ router.get("/", function (req, res, next) {
   res.send("You are on Index page.");
 });
 
-router.get('/profile', isLoggedIn, function(req, res) {
-  res.render('profile');
+/* GET profile page. */
+router.get('/profile', isLoggedIn, async function(req, res) {
+  const user = await userModel.findOne({
+    username: req.session.passport.user,
+  });
+  // console.log(user);
+  res.render('profile', {user});
 })
 
-router.post("/register", async function (req, res) {
+/* POST register */
+router.post("/signup", async function (req, res) {
   const { username, email, fullname } = req.body;
   let userData = new userModel({ username, email, fullname });
 
@@ -27,28 +33,36 @@ router.post("/register", async function (req, res) {
   });
 });
 
-router.post(
-  "/signin",
-  passport.authenticate("local", {
-    successRedirect: "/feed",
-    failureRedirect: "/login",
-  }),
-  function (req, res) {
-    res.send("Test Test");
-  }
-);
-
-router.get('/login', function(req, res) {
-  res.render('login');
-});
-
+/* GET signup page */
 router.get('/signup', function(req, res) {
   res.render('signup');
 });
-router.get('/feed', function(req, res) {
+
+
+/* POST login */
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/feed",
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  function (req, res) {
+    
+  }
+);
+
+/* GET login */
+router.get('/login', function(req, res, next) {
+  res.render('login', {error: req.flash('error')});
+});
+
+/* GET feed page */
+router.get('/feed', isLoggedIn, function(req, res) {
   res.render('feed');
 });
 
+/* GET logout */
 router.get('/logout', function(req, res,next) {
   req.logout(function(err) {
     if(err) {
@@ -58,6 +72,7 @@ router.get('/logout', function(req, res,next) {
   })
 });
 
+/* is logged in? middleware */
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) return next();
   res.redirect('/login');

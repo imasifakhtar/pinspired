@@ -8,57 +8,68 @@ const upload = require("./multer");
 
 passport.use(new localStrategy(userModel.authenticate()));
 
-/* GET home page. */
+// GET home page
 router.get("/", function (req, res) {
   res.render("index");
-});
+}); 
 
-/* GET profile page. */
+// Combined route for signup (GET and POST)
+router
+  .route("/signup")
+  .get(function (req, res) {
+    res.render("signup");
+  })
+  .post(async function (req, res) {
+    const { username, email, fullname } = req.body;
+    let userData = new userModel({ username, email, fullname });
+
+    userModel.register(userData, req.body.password).then(function () {
+      passport.authenticate("local")(req, res, function () {
+        res.redirect("/profile");
+      });
+    });
+  });
+
+// Combined route for login (GET and POST)
+router
+  .route("/login")
+  .get(function (req, res) {
+    res.render("login", { error: req.flash("error") });
+  })
+  .post(
+    passport.authenticate("local", {
+      successRedirect: "/profile",
+      failureRedirect: "/login",
+      failureFlash: true,
+    }),
+    function (req, res) {}
+  );
+
+// GET profile page
 router.get("/profile", isLoggedIn, async function (req, res) {
-  const user = await userModel.findOne({
-    username: req.session.passport.user,
-  }).populate('posts');
-  // console.log(user);
+  const user = await userModel
+    .findOne({
+      username: req.session.passport.user,
+    })
+    .populate("posts");
   res.render("profile", { user });
 });
 
-/* POST register */
-router.post("/signup", async function (req, res) {
-  const { username, email, fullname } = req.body;
-  let userData = new userModel({ username, email, fullname });
-
-  userModel.register(userData, req.body.password).then(function () {
-    passport.authenticate("local")(req, res, function () {
-      res.redirect("/profile");
-    });
-  });
+// GET feed page
+router.get("/feed", isLoggedIn, function (req, res) {
+  res.render("feed");
 });
 
-/* GET signup page */
-router.get("/signup", function (req, res) {
-  res.render("signup");
-});
-
-/* POST login */
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    successRedirect: "/profile",
-    failureRedirect: "/login",
-    failureFlash: true,
-  }),
-  function (req, res) {}
-);
-
+// POST upload
 router.post(
   "/upload",
   isLoggedIn,
   upload.single("file"),
   async function (req, res, next) {
     if (!req.file) {
-      return res.status(404).send("no files were uploaded");
+      return res.status(404).send("No files were uploaded");
     }
-    // res.send("File uploaded successfully");
+
     const user = await userModel.findOne({
       username: req.session.passport.user,
     });
@@ -72,21 +83,11 @@ router.post(
     user.posts.push(post._id);
     await user.save();
 
-    res.send("Done");
+    res.redirect("/profile");
   }
 );
 
-/* GET login */
-router.get("/login", function (req, res, next) {
-  res.render("login", { error: req.flash("error") });
-});
-
-/* GET feed page */
-router.get("/feed", isLoggedIn, function (req, res) {
-  res.render("feed");
-});
-
-/* GET logout */
+// GET logout
 router.get("/logout", function (req, res, next) {
   req.logout(function (err) {
     if (err) {
@@ -96,7 +97,7 @@ router.get("/logout", function (req, res, next) {
   });
 });
 
-/* is logged in? middleware */
+// Middleware: isLoggedIn
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) return next();
   res.redirect("/login");

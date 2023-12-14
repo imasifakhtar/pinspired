@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const plm = require('passport-local-mongoose');
+require('dotenv').config();
 
-mongoose.connect("mongodb://127.0.0.1:27017/pinspiredDB");
+mongoose.connect(process.env.dbURL);
 
 const userSchema = new mongoose.Schema({
   username: {

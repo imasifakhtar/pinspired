@@ -10,7 +10,7 @@
 
 <body>
   <% include ./partials/header.ejs %>
-  <div class="container">
+  <!-- <div class="container"> -->
     <div class="card">
       <div class="profile-picture">
         <img src="https://i.pinimg.com/280x280_RS/fe/7d/ee/fe7deef834e1fafe56f8023ced803ca9.jpg" alt="Profile Picture">
@@ -22,7 +22,8 @@
       </h3>
       <p class="tagline">Keep going.</p>
       <p class="description">Masih belajar CSS dan HTML.</p>
-      <a href="/logout" class="button">Visit Profile</a>
+      <a href="/share" class="button">Share</a>
+      <a href="/edit" class="button">Edit Profile</a>
 
       <form action="/upload" method="post" enctype="multipart/form-data">
         <input type="text" name="caption">
@@ -30,7 +31,7 @@
         <input type="submit" value="Upload">
       </form>
     </div>
-  </div>
+  <!-- </div> -->
 
   <div class="container">
     <div class="cards">
@@ -44,6 +45,7 @@
         <% }) %>
     </div>
   </div>
+  <% include ./partials/footer.ejs %>
 </body>
 
 </html>

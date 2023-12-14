@@ -1,10 +1,21 @@
-.container {
+header {
   display: flex;
   justify-content: space-between;
-  padding-top: 10px;
+  padding: 1% 12.5%;
 }
 
-.links {
+.nav-links {
     display: flex;
     gap: 15px;
+    list-style: none;
+    align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  background-color: #3fb196;
+  padding: 5px 10px;
+  color: #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
 }

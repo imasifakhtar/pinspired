@@ -11,7 +11,7 @@ passport.use(new localStrategy(userModel.authenticate()));
 // GET home page
 router.get("/", function (req, res) {
   res.render("index");
-}); 
+});
 
 // Combined route for signup (GET and POST)
 router
@@ -61,11 +61,9 @@ router.get("/feed", isLoggedIn, function (req, res) {
 });
 
 // POST upload
-router.post(
-  "/upload",
-  isLoggedIn,
-  upload.single("file"),
-  async function (req, res, next) {
+router
+  .route("/upload")
+  .post(isLoggedIn, upload.single("file"), async function (req, res, next) {
     if (!req.file) {
       return res.status(404).send("No files were uploaded");
     }
@@ -84,8 +82,10 @@ router.post(
     await user.save();
 
     res.redirect("/profile");
-  }
-);
+  })
+  .get(function (req, res) {
+    res.render("upload");
+  });
 
 // GET logout
 router.get("/logout", function (req, res, next) {

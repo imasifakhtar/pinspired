@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/upload.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <% include ./partials/header.ejs %>
+    <!-- <form enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="text" name="caption">
+        <input type="submit" value="Upload">
+    </form> -->
+    <main>
+        <form id="pinForm" action="/upload" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="pinImage">Choose Image:</label>
+            <input type="file" id="pinImage" name="file" accept="image/*" required>
+          </div>
+          <div class="image-preview">
+            <img id="previewImage" src="#" alt="Preview Image" style="display: none;">
+          </div>
+          <div class="form-group">
+            <label for="pinDescription">Description:</label>
+            <textarea id="pinDescription" name="caption" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <button type="submit">Upload Pin</button>
+          </div>
+        </form>
+      </main>
+    <% include ./partials/footer.ejs %>
+</body>
+
+</html>

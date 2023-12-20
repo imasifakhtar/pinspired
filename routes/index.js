@@ -56,8 +56,14 @@ router.get("/profile", isLoggedIn, async function (req, res) {
 });
 
 // GET feed page
-router.get("/feed", isLoggedIn, function (req, res) {
-  res.render("feed", { nav: true });
+router.get("/feed", isLoggedIn, async function (req, res) {
+  let allPosts;
+  try {
+    allPosts = await postModel.find({});
+  } catch (error) {
+    console.log(error);
+  }
+  res.render("feed", { nav: true, posts: allPosts });
 });
 
 // POST upload

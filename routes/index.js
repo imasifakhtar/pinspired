@@ -10,14 +10,14 @@ passport.use(new localStrategy(userModel.authenticate()));
 
 // GET home page
 router.get("/", function (req, res) {
-  res.render("index");
+  res.render("index", { nav: true });
 });
 
 // Combined route for signup (GET and POST)
 router
   .route("/signup")
   .get(function (req, res) {
-    res.render("signup");
+    res.render("signup", { nav: false });
   })
   .post(async function (req, res) {
     const { username, email, fullname } = req.body;
@@ -34,7 +34,7 @@ router
 router
   .route("/login")
   .get(function (req, res) {
-    res.render("login", { error: req.flash("error") });
+    res.render("login", { nav: false, error: req.flash("error") });
   })
   .post(
     passport.authenticate("local", {
@@ -52,12 +52,12 @@ router.get("/profile", isLoggedIn, async function (req, res) {
       username: req.session.passport.user,
     })
     .populate("posts");
-  res.render("profile", { user });
+  res.render("profile", { user, nav: true });
 });
 
 // GET feed page
 router.get("/feed", isLoggedIn, function (req, res) {
-  res.render("feed");
+  res.render("feed", { nav: true });
 });
 
 // POST upload
@@ -83,8 +83,8 @@ router
 
     res.redirect("/profile");
   })
-  .get(function (req, res) {
-    res.render("upload");
+  .get(isLoggedIn, function (req, res) {
+    res.render("upload", { nav: true });
   });
 
 // GET logout

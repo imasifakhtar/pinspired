@@ -33,7 +33,7 @@ router
 // Combined route for login (GET and POST)
 router
   .route("/login")
-  .get(function (req, res) {
+  .get(isLoggedIn, function (req, res) {
     res.render("login", { nav: false, error: req.flash("error") });
   })
   .post(
@@ -59,6 +59,7 @@ router.get("/profile", isLoggedIn, async function (req, res) {
 router.get("/feed", isLoggedIn, async function (req, res) {
   let allPosts;
   try {
+
     allPosts = await postModel.find({});
   } catch (error) {
     console.log(error);
@@ -106,7 +107,7 @@ router.get("/logout", function (req, res, next) {
 // Middleware: isLoggedIn
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) return next();
-  res.redirect("/login");
+  res.redirect("/feed");
 }
 
 module.exports = router;
